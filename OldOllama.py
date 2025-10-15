@@ -1,40 +1,44 @@
+from ollama import Client
 import requests
-import json
 
-# Adresse deines Ollama-Servers
-OLLAMA_SERVER = "http://md3fgqdc:11434"  # oder http://10.176.176.73:11434
+def test_ollama_connection(host: str) -> bool:
+    """Check if the Ollama server is reachable."""
+    try:
+        r = requests.get(f"{host}/api/version", timeout=5)
+        if r.status_code == 200:
+            print(f"✅ Ollama server reachable: {r.json()}")
+            return True
+        else:
+            print(f"❌ Server responded with status {r.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Connection error: {e}")
+        return False
 
-# Modell
-#MODEL = "qwen3:8b"
-#MODEL = "gemma3:4b"
-#MODEL = "deepseek-r1:8b"
-#MODEL = "phi4-mini-reasoning"
-MODEL = "granite4:tiny-h"
-#MODEL = "deepseek-r1:8b"
 
-prompt = "Schreibe einen Witz über künstliche Intelligenz auf Deutsch mit ca 137 wörter."
-#prompt = "Berechne die Höhe eines Turms, von dem ein Stein fallen gelassen wird, wenn man den Aufprall nach 5 Sekunden hört."
-def test_ollama_api():
-    url = f"{OLLAMA_SERVER}/api/generate"
-    payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False  # Kein Stream, einfache Antwort
-    }
+def main():
+    host = "http://md3fgqdc:11434"
+
+    if not test_ollama_connection(host):
+        return
+
+    client = Client(
+        host=host,
+        headers={"x-some-header": "some-value"},
+    )
 
     try:
-        # 'json=payload' setzt automatisch den Header Content-Type: application/json
-        response = requests.post(url, json=payload, timeout=560)
-        response.raise_for_status()
-        data = response.json()
-        print("✅ Verbindung erfolgreich!")
-        print("Antwort vom Modell:")
-        print(data.get("response", "Keine Antwort erhalten."))
-    except requests.exceptions.HTTPError as e:
-        print("❌ HTTP-Fehler:", e.response.status_code)
-        print("Antworttext:", e.response.text)
-    except requests.exceptions.RequestException as e:
-        print("❌ Verbindungsfehler:", e)
+        response = client.chat(
+            model="granite4:tiny-h",
+            messages=[
+                {"role": "user", "content": "Why is the sky blue?"},
+            ],
+        )
+        print("✅ Response received:")
+        print(response["message"]["content"])
+    except Exception as e:
+        print(f"❌ Ollama request failed: {e}")
+
 
 if __name__ == "__main__":
-    test_ollama_api()
+    main()
