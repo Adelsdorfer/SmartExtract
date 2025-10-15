@@ -26,10 +26,10 @@ warnings.filterwarnings(
 # Modell
 #MODEL = "qwen3:8b"
 MODEL = "gemma3:4b"
-#MODEL = "deepseek-r1:8b"
+#MODEL = "deepseek-r1:8b" 'dont use
 #MODEL = "phi4-mini-reasoning"
 #MODEL = "granite4:tiny-h"
-#MODEL = "deepseek-r1:8b"
+#MODEL = "deepseek-r1:8b" 'dont use
 
 #MODEL = "granite4:tiny-h"
 
