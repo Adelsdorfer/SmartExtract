@@ -42,7 +42,7 @@ class MainApp(tk.Tk):
         self.selected_file = tk.StringVar()
         self.status_message = tk.StringVar()
         self.current_directory_var = tk.StringVar(value=str(self._current_directory))
-        self.api_host_var = tk.StringVar(value="http://192.168.114.1:1234")
+        self.api_host_var = tk.StringVar(value="http://md3fgqdc:11434")
         self.server_status_var = tk.StringVar(value="Server status: unknown")
         self.prompt_var = tk.StringVar()
         self.model_var = tk.StringVar()
