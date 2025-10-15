@@ -23,7 +23,15 @@ warnings.filterwarnings(
     module="openpyxl",
 )
 
-MODEL = "granite4:tiny-h"
+# Modell
+#MODEL = "qwen3:8b"
+MODEL = "gemma3:4b"
+#MODEL = "deepseek-r1:8b"
+#MODEL = "phi4-mini-reasoning"
+#MODEL = "granite4:tiny-h"
+#MODEL = "deepseek-r1:8b"
+
+#MODEL = "granite4:tiny-h"
 
 
 class MainApp(tk.Tk):
@@ -37,7 +45,7 @@ class MainApp(tk.Tk):
         self._current_df: Optional[pd.DataFrame] = None
         self._current_columns: List[str] = []
         self._excel_paths: List[Path] = []
-        self._current_directory: Path = Path(r"e:\Notiscan")
+        self._current_directory: Path = Path(r"C:\SmartExtract")
         self._server_reachable: bool = False
 
         self.selected_file = tk.StringVar()
@@ -45,7 +53,7 @@ class MainApp(tk.Tk):
         self.current_directory_var = tk.StringVar(value=str(self._current_directory))
         self.api_host_var = tk.StringVar(value="http://md3fgqdc:11434")
         self.server_status_var = tk.StringVar(value="Server status: unknown")
-        self.prompt_var = tk.StringVar()
+        self.prompt_var = tk.StringVar(value="Summarize the following CT service report, focusing only on the essential technical information: parts used or replaced, root cause (if mentioned), on-site visits, and key service actions. Write the summary in a clear and structured format.")
         self.model_var = tk.StringVar(value=MODEL)
         self.temperature_var = tk.DoubleVar(value=0.5)
         self._model_option_map: Dict[str, Optional[str]] = {MODEL: MODEL}
@@ -178,7 +186,7 @@ class MainApp(tk.Tk):
         )
         temperature_spinbox.grid(row=1, column=5, sticky="w")
 
-        self.summarize_button = ttk.Button(noti_frame, text="Summarize", command=self.summarize_current_text)
+        self.summarize_button = ttk.Button(noti_frame, text="Process", command=self.summarize_current_text)
         self.summarize_button.grid(row=1, column=6, padx=(8, 0))
         self.summarize_button.configure(state="disabled")
 
@@ -203,7 +211,7 @@ class MainApp(tk.Tk):
         noti_scroll.grid(row=0, column=1, sticky="ns")
         self.noti_text.configure(yscrollcommand=noti_scroll.set)
 
-        summary_frame = ttk.Labelframe(content, text="LLM Summary", style="Noti.TLabelframe")
+        summary_frame = ttk.Labelframe(content, text="LLM Output", style="Noti.TLabelframe")
         summary_frame.grid(row=1, column=1, sticky="nsew")
         summary_frame.columnconfigure(0, weight=1)
         summary_frame.rowconfigure(0, weight=1)
