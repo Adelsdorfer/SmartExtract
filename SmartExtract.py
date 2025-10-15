@@ -37,7 +37,7 @@ class MainApp(tk.Tk):
         self._current_df: Optional[pd.DataFrame] = None
         self._current_columns: List[str] = []
         self._excel_paths: List[Path] = []
-        self._current_directory: Path = Path(r"e:\Notiscan")
+        self._current_directory: Path = Path(r"C:\SmartExtract")
 
         self.selected_file = tk.StringVar()
         self.status_message = tk.StringVar()
