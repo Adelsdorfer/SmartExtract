@@ -7,7 +7,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 import warnings
 
 import pandas as pd
@@ -24,14 +24,15 @@ warnings.filterwarnings(
 )
 
 # Modell
-MODEL = "qwen3:8b"
-#MODEL = "gemma3:4b"
-#MODEL = "deepseek-r1:8b"
-#MODEL = "phi4-mini-reasoning"
-#MODEL = "granite4:tiny-h"
-#MODEL = "deepseek-r1:8b"
-
-#MODEL = "gpt-oss:20b"
+MODEL = "granite4:tiny-h"
+MODEL_OPTIONS = [
+    "granite4:tiny-h",
+    "qwen3:8b",
+    "gemma3:4b",
+    "deepseek-r1:8b",
+    "phi4-mini-reasoning",
+    "gpt-oss:20b",
+]
 
 
 class MainApp(tk.Tk):
@@ -56,8 +57,6 @@ class MainApp(tk.Tk):
         self.prompt_var = tk.StringVar(value="Summarize the following CT service report, focusing only on the essential technical information: parts used or replaced, root cause (if mentioned), on-site visits, and key service actions. Write the summary in a clear and structured format.")
         self.model_var = tk.StringVar(value=MODEL)
         self.temperature_var = tk.DoubleVar(value=0.5)
-        self._model_option_map: Dict[str, Optional[str]] = {MODEL: MODEL}
-        self._available_models: List[Tuple[str, Optional[str]]] = [(MODEL, MODEL)]
         self.current_noti_text = ""
         self._configured_api_host: Optional[str] = None
 
@@ -169,11 +168,10 @@ class MainApp(tk.Tk):
             textvariable=self.model_var,
             state="readonly",
             width=30,
-            values=[MODEL],
+            values=MODEL_OPTIONS,
         )
         self.model_combobox.grid(row=1, column=3, sticky="ew", padx=(0, 8))
-        self.model_combobox.current(0)
-        self.model_combobox.configure(state="disabled")
+        self.model_combobox.current(MODEL_OPTIONS.index(MODEL))
 
         ttk.Label(noti_frame, text="Temperature:").grid(row=1, column=4, sticky="e", padx=(0, 4))
         temperature_spinbox = ttk.Spinbox(
@@ -515,13 +513,15 @@ class MainApp(tk.Tk):
         if self.summarize_button:
             self.summarize_button.configure(state="disabled")
 
+        selected_model = self.model_var.get().strip() or MODEL
+
         threading.Thread(
             target=self._run_ollama_stream,
-            args=(combined_prompt, temperature),
+            args=(combined_prompt, temperature, selected_model),
             daemon=True,
         ).start()
 
-    def _run_ollama_stream(self, combined_prompt: str, temperature: float) -> None:
+    def _run_ollama_stream(self, combined_prompt: str, temperature: float, model_name: str) -> None:
         """Stream the Ollama response and update the UI incrementally."""
         try:
             host_value = self._configured_api_host or self._parse_api_host(self.api_host_var.get())
@@ -534,7 +534,7 @@ class MainApp(tk.Tk):
         try:
             client = Client(host=host_value)
             stream = client.chat(
-                model=MODEL,
+                model=model_name or MODEL,
                 messages=[{"role": "user", "content": combined_prompt}],
                 stream=True,
                 options={"temperature": temperature},
