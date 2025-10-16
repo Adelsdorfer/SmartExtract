@@ -510,7 +510,7 @@ class MainApp(tk.Tk):
         prompt_parts.append(f"Noti Text:\n{self.current_noti_text}")
         combined_prompt = "\n\n".join(prompt_parts)
 
-        self.status_message.set("Summarizing Noti Text...")
+        self.status_message.set("Processing Input, please wait...")
         self.update_summary_output("")
         if self.summarize_button:
             self.summarize_button.configure(state="disabled")
@@ -552,7 +552,7 @@ class MainApp(tk.Tk):
 
     def _on_summarization_success(self) -> None:
         """Handle successful completion of summarization."""
-        self.status_message.set("Summarization complete.")
+        self.status_message.set("Processing complete.")
         if self.summarize_button:
             self.summarize_button.configure(state="normal")
         self._refresh_summarize_button_state()
@@ -568,9 +568,9 @@ class MainApp(tk.Tk):
         """Display summarization errors with UI feedback."""
         if self.summarize_button:
             self.summarize_button.configure(state="normal")
-        self.status_message.set(f"Summarization failed: {message}")
+        self.status_message.set(f"Prozessing failed: {message}")
         self.update_summary_output("")
-        messagebox.showerror("Summarize", f"Summarization failed: {message}")
+        messagebox.showerror("Summarize", f"Prozessing failed: {message}")
         self._refresh_summarize_button_state()
 
 
