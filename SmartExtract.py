@@ -24,14 +24,14 @@ warnings.filterwarnings(
 )
 
 # Modell
-#MODEL = "qwen3:8b"
-MODEL = "gemma3:4b"
-#MODEL = "deepseek-r1:8b" 'dont use
+MODEL = "qwen3:8b"
+#MODEL = "gemma3:4b"
+#MODEL = "deepseek-r1:8b"
 #MODEL = "phi4-mini-reasoning"
 #MODEL = "granite4:tiny-h"
-#MODEL = "deepseek-r1:8b" 'dont use
+#MODEL = "deepseek-r1:8b"
 
-#MODEL = "granite4:tiny-h"
+#MODEL = "gpt-oss:20b"
 
 
 class MainApp(tk.Tk):
@@ -39,7 +39,7 @@ class MainApp(tk.Tk):
 
     def __init__(self) -> None:
         super().__init__()
-        self.title("Excel Noti Viewer")
+        self.title("SmartExtract | Roland Emrich")
         self.geometry("1900x1200")
 
         self._current_df: Optional[pd.DataFrame] = None
