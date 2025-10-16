@@ -55,7 +55,9 @@ class MainApp(tk.Tk):
         self.current_directory_var = tk.StringVar(value=str(self._current_directory))
         self.api_host_var = tk.StringVar(value="http://md3fgqdc:11434")
         self.server_status_var = tk.StringVar(value="Server status: unknown")
-        self.prompt_var = tk.StringVar(value="Summarize the following CT service report, focusing only on the essential technical information: parts used or replaced, root cause (if mentioned), on-site visits, and key service actions. Write the summary in a clear and structured format.")
+        # self.prompt_var = tk.StringVar(value="Summarize the following CT service report, focusing only on the essential technical information: parts used or replaced, root cause (if mentioned), on-site visits, and key service actions. Write the summary in a clear and structured format.")
+        self.prompt_var = tk.StringVar(value="Act as a technical writer for CT service reports. Summarize the following report in clear, human-readable English, structured as: 1) Summary of Issue, 2) Timeline with Key Actions, 3) Technical Details, 4) Correspondence, 5) Final Outcome. Keep all log entries (e.g., timestamped technical messages) exactly as written (1:1, no edits)")
+        
         self.model_var = tk.StringVar(value=MODEL)
         self.temperature_var = tk.DoubleVar(value=0.5)
         self.current_noti_text = ""
@@ -222,7 +224,7 @@ class MainApp(tk.Tk):
         noti_scroll.grid(row=0, column=1, sticky="ns")
         self.noti_text.configure(yscrollcommand=noti_scroll.set)
 
-        summary_frame = ttk.Labelframe(content, text="LLM Output", style="Noti.TLabelframe")
+        summary_frame = ttk.Labelframe(content, text="Output", style="Noti.TLabelframe")
         summary_frame.grid(row=1, column=1, sticky="nsew")
         summary_frame.columnconfigure(0, weight=1)
         summary_frame.rowconfigure(0, weight=1)
