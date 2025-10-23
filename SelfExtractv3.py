@@ -41,6 +41,11 @@ MODEL_OPTIONS = [
 ]
 INITIAL_SERVER_CHECK_DELAY_MS = 4000
 AUTO_SERVER_CHECK_INTERVAL_MS = 8000
+SERVER_PRESETS = [
+    ("SHS5CG5242LKMC", "http://SHS5CG5242LKMC:11434"),
+    ("md3fgqdc", "http://md3fgqdc:11434"),
+]
+SERVER_PRESET_MAP = {label: url for label, url in SERVER_PRESETS}
 PROMPT_PRESETS = {
     "Technical Writer": (
         "Act as a technical writer for CT service reports. Summarize the following report in clear, "
@@ -87,7 +92,8 @@ class MainApp(tk.Tk):
         self.status_message = tk.StringVar()
         self.current_directory_var = tk.StringVar(value=str(self._current_directory))
         self.api_host_var = tk.StringVar(value="http://SHS5CG5242LKMC:11434")
-        #self.api_host_var = tk.StringVar(value="http://md3fgqdc:11434")
+        server_choice_default = self._determine_server_choice(self.api_host_var.get())
+        self.server_choice_var = tk.StringVar(value=server_choice_default)
         self.server_status_var = tk.StringVar(value="Server status: unknown")
         self.prompt_var = tk.StringVar(value=PROMPT_PRESETS["Technical Writer"])
         default_prompt_choice = next(
@@ -118,9 +124,12 @@ class MainApp(tk.Tk):
         self.noti_text: Optional[tk.Text] = None
         self.prompt_text_widget: Optional[tk.Text] = None
         self.prompt_preset_combobox: Optional[ttk.Combobox] = None
+        self.server_combobox: Optional[ttk.Combobox] = None
 
         self._tree_font = tkfont.nametofont("TkDefaultFont")
 
+        self.api_host_var.trace_add("write", self._on_api_host_change)
+        self.server_choice_var.trace_add("write", self._on_server_choice_change)
         self._configure_style()
         self._build_ui()
         self._populate_excel_list()
@@ -155,16 +164,26 @@ class MainApp(tk.Tk):
         choose_button.grid(row=0, column=2, padx=(8, 0))
 
         ttk.Label(toolbar, text="API host:").grid(row=0, column=3, padx=(16, 6), sticky="e")
+        server_labels = ["Custom"] + [label for label, _ in SERVER_PRESETS]
+        self.server_combobox = ttk.Combobox(
+            toolbar,
+            textvariable=self.server_choice_var,
+            state="readonly",
+            width=18,
+            values=server_labels,
+        )
+        self.server_combobox.grid(row=0, column=4, sticky="ew", padx=(0, 6))
+
         api_entry = ttk.Entry(toolbar, textvariable=self.api_host_var, width=28)
-        api_entry.grid(row=0, column=4, sticky="ew")
+        api_entry.grid(row=0, column=5, sticky="ew")
 
         self.check_server_button = ttk.Button(toolbar, text="Check Server", command=self.check_server_status)
-        self.check_server_button.grid(row=0, column=5, padx=(8, 0))
+        self.check_server_button.grid(row=0, column=6, padx=(8, 0))
 
         self.server_status_label = ttk.Label(toolbar, textvariable=self.server_status_var)
-        self.server_status_label.grid(row=0, column=6, padx=(8, 0), sticky="w")
+        self.server_status_label.grid(row=0, column=7, padx=(8, 0), sticky="w")
 
-        ttk.Separator(toolbar, orient="horizontal").grid(row=1, column=0, columnspan=7, sticky="ew", pady=4)
+        ttk.Separator(toolbar, orient="horizontal").grid(row=1, column=0, columnspan=8, sticky="ew", pady=4)
 
         ttk.Label(toolbar, text="Excel file:").grid(row=2, column=0, padx=(0, 8))
 
@@ -926,6 +945,28 @@ class MainApp(tk.Tk):
             if not candidate.exists():
                 return candidate
             counter += 1
+
+    def _determine_server_choice(self, host_value: str) -> str:
+        """Map an API host value to a preset choice."""
+        for label, url in SERVER_PRESETS:
+            if host_value == url:
+                return label
+        return "Custom"
+
+    def _on_server_choice_change(self, *_: object) -> None:
+        """Update API host entry when a preset server is selected."""
+        choice = self.server_choice_var.get()
+        if choice == "Custom":
+            return
+        url = SERVER_PRESET_MAP.get(choice)
+        if url and self.api_host_var.get() != url:
+            self.api_host_var.set(url)
+
+    def _on_api_host_change(self, *_: object) -> None:
+        """Adjust selected preset when API host entry changes."""
+        choice = self._determine_server_choice(self.api_host_var.get())
+        if choice != self.server_choice_var.get():
+            self.server_choice_var.set(choice)
 
 
 if __name__ == "__main__":
